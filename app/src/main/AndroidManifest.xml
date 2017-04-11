@@ -35,13 +35,13 @@
             android:name=".account.ui.AddAccountActivity"
             android:launchMode="singleTop"
             android:noHistory="true"
-            android:theme="@style/Theme.Douya.NoDisplay" />
+            android:theme="@style/Theme.Douya.Translucent" />
 
         <activity
             android:name=".account.ui.SelectAccountActivity"
             android:launchMode="singleTop"
             android:noHistory="true"
-            android:theme="@style/Theme.Douya.NoDisplay" />
+            android:theme="@style/Theme.Douya.Translucent" />
 
         <activity
             android:name=".ui.WebViewActivity"
@@ -70,7 +70,7 @@
 
         <activity
             android:name=".broadcast.ui.BroadcastActivity"
-            android:theme="@style/Theme.Douya.DarkBackground"
+            android:theme="@style/Theme.Douya.BroadcastActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
@@ -89,6 +89,11 @@
             android:label="@string/profile_following_list_title" />
 
         <activity
+            android:name=".item.ui.MovieActivity"
+            android:theme="@style/Theme.Douya.Movie"
+            android:label="@string/item_movie_title" />
+
+        <activity
             android:name=".item.ui.ItemCollectionActivity"
             android:theme="@style/Theme.Douya"
             android:label="@string/item_collection_title" />
@@ -97,17 +102,26 @@
             android:name=".settings.ui.SettingsActivity"
             android:exported="false"
             android:label="@string/settings_title"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Douya">
             <intent-filter>
                 <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".main.ui.MainActivity" />
         </activity>
 
         <activity
             android:name=".settings.ui.AboutActivity"
             android:label="@string/about_title"
-            android:theme="@style/Theme.Douya.PrimaryColorBackground" />
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Douya.PrimaryColorBackground">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".settings.ui.SettingsActivity" />
+        </activity>
 
         <service
             android:name=".account.app.AuthenticatorService"

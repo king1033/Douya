@@ -28,7 +28,7 @@ import me.zhanghai.android.douya.eventbus.EventBusUtils;
 import me.zhanghai.android.douya.eventbus.NotificationUpdatedEvent;
 import me.zhanghai.android.douya.network.api.ApiError;
 import me.zhanghai.android.douya.network.api.info.frodo.Notification;
-import me.zhanghai.android.douya.notification.app.NotificationListResource;
+import me.zhanghai.android.douya.notification.content.NotificationListResource;
 import me.zhanghai.android.douya.ui.LoadMoreAdapter;
 import me.zhanghai.android.douya.ui.NoChangeAnimationItemAnimator;
 import me.zhanghai.android.douya.ui.OnVerticalScrollListener;
@@ -53,6 +53,16 @@ public class NotificationListFragment extends Fragment implements NotificationLi
 
     private Listener mListener;
 
+    public static NotificationListFragment newInstance() {
+        //noinspection deprecation
+        return new NotificationListFragment();
+    }
+
+    /**
+     * @deprecated Use {@link #newInstance()} instead.
+     */
+    public NotificationListFragment() {}
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,8 +81,6 @@ public class NotificationListFragment extends Fragment implements NotificationLi
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        final Activity activity = getActivity();
-
         mNotificationListResource = NotificationListResource.attachTo(this);
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -84,6 +92,7 @@ public class NotificationListFragment extends Fragment implements NotificationLi
 
         mNotificationList.setHasFixedSize(true);
         mNotificationList.setItemAnimator(new NoChangeAnimationItemAnimator());
+        Activity activity = getActivity();
         mNotificationList.setLayoutManager(new LinearLayoutManager(activity));
         mNotificationAdapter = new NotificationAdapter(mNotificationListResource.get(), activity);
         mNotificationAdapter.setListener(this);

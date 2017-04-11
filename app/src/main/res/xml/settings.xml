@@ -20,6 +20,12 @@
             android:title="@string/settings_show_title_for_link_entity_title"
             android:summary="@string/settings_show_title_for_link_entity_summary" />
 
+        <SwitchPreferenceCompat
+            android:key="@string/pref_key_progressive_third_party_app"
+            android:defaultValue="@bool/pref_default_value_progressive_third_party_app"
+            android:title="@string/settings_progressive_third_party_app_title"
+            android:summary="@string/settings_progressive_third_party_app_summary" />
+
         <ListPreference
             android:key="@string/pref_key_open_url_with"
             android:entryValues="@array/pref_entry_values_open_url_with"
@@ -43,8 +49,15 @@
 
     <PreferenceCategory android:title="@string/settings_about_title">
 
-        <me.zhanghai.android.douya.settings.ui.LicensesDialogPreference
+        <me.zhanghai.android.douya.ui.LicensesDialogPreference
             android:title="@string/settings_open_source_licenses_title" />
+
+        <Preference
+            android:title="@string/settings_privacy_policy_title">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://github.com/DreaminginCodeZH/Douya/blob/master/PRIVACY.md" />
+        </Preference>
 
         <Preference
             android:title="@string/settings_about_douya_title">

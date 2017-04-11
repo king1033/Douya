@@ -16,7 +16,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 
 import com.google.gson.JsonParseException;
@@ -30,7 +29,7 @@ import me.zhanghai.android.douya.account.info.AccountContract;
 import me.zhanghai.android.douya.account.ui.AddAccountActivity;
 import me.zhanghai.android.douya.account.ui.SelectAccountActivity;
 import me.zhanghai.android.douya.network.Volley;
-import me.zhanghai.android.douya.network.api.info.apiv2.UserInfo;
+import me.zhanghai.android.douya.network.api.info.apiv2.User;
 import me.zhanghai.android.douya.settings.info.Settings;
 import me.zhanghai.android.douya.util.GsonHelper;
 
@@ -44,7 +43,7 @@ public class AccountUtils {
                                                           AccountManagerCallback<Bundle> callback,
                                                           Handler handler) {
         return getAccountManager().addAccount(AccountContract.ACCOUNT_TYPE,
-                AccountContract.AUTH_TOKEN_TYPE, null, null, activity, callback, handler);
+                AccountContract.AUTH_TOKEN_TYPE_FRODO, null, null, activity, callback, handler);
     }
 
     public static AccountManagerFuture<Bundle> addAccount(Activity activity) {
@@ -52,9 +51,7 @@ public class AccountUtils {
     }
 
     public static void addAccount(Activity activity, Intent onAddedIntent) {
-        Intent intent = new Intent(activity, AddAccountActivity.class);
-        intent.putExtra(AddAccountActivity.EXTRA_ON_ADDED_INTENT, onAddedIntent);
-        activity.startActivity(intent);
+        activity.startActivity(AddAccountActivity.makeIntent(onAddedIntent, activity));
     }
 
     public static boolean addAccountExplicitly(Account account, String password) {
@@ -63,7 +60,7 @@ public class AccountUtils {
 
     public static AccountManagerFuture<Bundle> updatePassword(Activity activity, Account account,
                                    AccountManagerCallback<Bundle> callback, Handler handler) {
-        return getAccountManager().updateCredentials(account, AccountContract.AUTH_TOKEN_TYPE, null,
+        return getAccountManager().updateCredentials(account, AccountContract.AUTH_TOKEN_TYPE_FRODO, null,
                 activity, callback, handler);
     }
 
@@ -82,7 +79,7 @@ public class AccountUtils {
         void onFailed();
     }
 
-    private static AccountManagerCallback<Bundle> makeAccountManagerCallback(
+    private static AccountManagerCallback<Bundle> makeConfirmPasswordCallback(
             final ConfirmPasswordListener listener) {
         return new AccountManagerCallback<Bundle>() {
             @Override
@@ -105,7 +102,7 @@ public class AccountUtils {
 
     public static void confirmPassword(Activity activity, Account account,
                                        final ConfirmPasswordListener listener, Handler handler) {
-        confirmPassword(activity, account, makeAccountManagerCallback(listener), handler);
+        confirmPassword(activity, account, makeConfirmPasswordCallback(listener), handler);
     }
 
     public static void confirmPassword(Activity activity, final ConfirmPasswordListener listener) {
@@ -117,7 +114,7 @@ public class AccountUtils {
     public static Intent makeConfirmPasswordIntent(Account account,
                                                    final ConfirmPasswordListener listener) {
         try {
-            return confirmPassword(null, account, makeAccountManagerCallback(listener), null)
+            return confirmPassword(null, account, makeConfirmPasswordCallback(listener), null)
                     .getResult().getParcelable(AccountManager.KEY_INTENT);
         } catch (AuthenticatorException | IOException | OperationCanceledException e) {
             e.printStackTrace();
@@ -130,8 +127,7 @@ public class AccountUtils {
     }
 
     public static void addOnAccountListUpdatedListener(OnAccountsUpdateListener listener) {
-        getAccountManager().addOnAccountsUpdatedListener(listener, new Handler(Looper.myLooper()),
-                false);
+        getAccountManager().addOnAccountsUpdatedListener(listener, null, false);
     }
 
     public static void removeOnAccountListUpdatedListener(OnAccountsUpdateListener listener) {
@@ -159,6 +155,7 @@ public class AccountUtils {
 
     // NOTE: This method is asynchronous.
     public static void removeAccount(Account account) {
+        //noinspection deprecation
         getAccountManager().removeAccount(account, null, null);
     }
 
@@ -322,9 +319,7 @@ public class AccountUtils {
             throw new IllegalStateException("Should have checked for hasAccount()");
         }
 
-        Intent intent = new Intent(activity, SelectAccountActivity.class);
-        intent.putExtra(SelectAccountActivity.EXTRA_ON_SELECTED_INTENT, onSelectedIntent);
-        activity.startActivity(intent);
+        activity.startActivity(SelectAccountActivity.makeIntent(onSelectedIntent, activity));
     }
 
     public static boolean ensureActiveAccountAvailability(Activity activity) {
@@ -350,22 +345,52 @@ public class AccountUtils {
         getAccountManager().setPassword(account, password);
     }
 
-    public static String peekAuthToken(Account account) {
-        return getAccountManager().peekAuthToken(account, AccountContract.AUTH_TOKEN_TYPE);
+    public static String peekAuthToken(Account account, String type) {
+        return getAccountManager().peekAuthToken(account, type);
     }
 
-    public static String peekAuthToken() {
-        return peekAuthToken(getActiveAccount());
+    public static void getAuthToken(Account account, String type,
+                                    AccountManagerCallback<Bundle> callback, Handler handler) {
+        getAccountManager().getAuthToken(account, type, null, true, callback, handler);
     }
 
-    public static String getAuthToken(Account account) throws AuthenticatorException,
-            OperationCanceledException, IOException {
-        return getAccountManager().blockingGetAuthToken(account, AccountContract.AUTH_TOKEN_TYPE,
-                true);
+    public interface GetAuthTokenListener {
+        void onResult(String authToken);
+        void onFailed();
     }
 
-    public static void setAuthToken(Account account, String authToken) {
-        getAccountManager().setAuthToken(account, AccountContract.AUTH_TOKEN_TYPE, authToken);
+    private static AccountManagerCallback<Bundle> makeGetAuthTokenCallback(
+            final GetAuthTokenListener listener) {
+        return new AccountManagerCallback<Bundle>() {
+            @Override
+            public void run(AccountManagerFuture<Bundle> future) {
+                try {
+                    String authToken = future.getResult()
+                            .getString(AccountManager.KEY_AUTHTOKEN);
+                    if (!TextUtils.isEmpty(authToken)) {
+                        listener.onResult(authToken);
+                    } else {
+                        listener.onFailed();
+                    }
+                } catch (AuthenticatorException | IOException | OperationCanceledException e) {
+                    e.printStackTrace();
+                    listener.onFailed();
+                }
+            }
+        };
+    }
+
+    public static void getAuthToken(Account account, String type, GetAuthTokenListener listener,
+                                    Handler handler) {
+        getAuthToken(account, type, makeGetAuthTokenCallback(listener), handler);
+    }
+
+    public static void getAuthToken(Account account, String type, GetAuthTokenListener listener) {
+        getAuthToken(account, type, listener, null);
+    }
+
+    public static void setAuthToken(Account account, String type, String authToken) {
+        getAccountManager().setAuthToken(account, type, authToken);
     }
 
     public static void invalidateAuthToken(String authToken) {
@@ -400,23 +425,34 @@ public class AccountUtils {
         AccountPreferences.forAccount(account).putLong(AccountContract.KEY_USER_ID, userId);
     }
 
-    public static String getRefreshToken(Account account) {
-        return AccountPreferences.forAccount(account).getString(AccountContract.KEY_REFRESH_TOKEN,
+    public static String getRefreshToken(Account account, String authTokenType) {
+        return AccountPreferences.forAccount(account).getString(getRefreshTokenKey(authTokenType),
                 null);
     }
 
-    public static void setRefreshToken(Account account, String refreshToken) {
-        AccountPreferences.forAccount(account).putString(AccountContract.KEY_REFRESH_TOKEN,
+    public static void setRefreshToken(Account account, String authTokenType, String refreshToken) {
+        AccountPreferences.forAccount(account).putString(getRefreshTokenKey(authTokenType),
                 refreshToken);
     }
 
-    public static UserInfo getUserInfo(Account account) {
+    private static String getRefreshTokenKey(String authTokenType) {
+        switch (authTokenType) {
+            case AccountContract.AUTH_TOKEN_TYPE_API_V2:
+                return AccountContract.KEY_REFRESH_TOKEN_API_V2;
+            case AccountContract.AUTH_TOKEN_TYPE_FRODO:
+                return AccountContract.KEY_REFRESH_TOKEN_FRODO;
+            default:
+                throw new IllegalArgumentException("Unknown authTokenType: " + authTokenType);
+        }
+    }
+
+    public static User getUser(Account account) {
         String userInfoJson = AccountPreferences.forAccount(account).getString(
                 AccountContract.KEY_USER_INFO, null);
         if (!TextUtils.isEmpty(userInfoJson)) {
             try {
                 return GsonHelper.get().fromJson(userInfoJson,
-                        new TypeToken<UserInfo>() {}.getType());
+                        new TypeToken<User>() {}.getType());
             } catch (JsonParseException e) {
                 e.printStackTrace();
             }
@@ -424,18 +460,18 @@ public class AccountUtils {
         return null;
     }
 
-    public static void setUserInfo(Account account, UserInfo userInfo) {
-        String userInfoJson = GsonHelper.get().toJson(userInfo,
-                new TypeToken<UserInfo>() {}.getType());
+    public static void setUser(Account account, User user) {
+        String userInfoJson = GsonHelper.get().toJson(user,
+                new TypeToken<User>() {}.getType());
         AccountPreferences.forAccount(account).putString(AccountContract.KEY_USER_INFO,
                 userInfoJson);
     }
 
-    public static UserInfo getUserInfo() {
-        return getUserInfo(getActiveAccount());
+    public static User getUser() {
+        return getUser(getActiveAccount());
     }
 
-    public static void setUserInfo(UserInfo userInfo) {
-        setUserInfo(getActiveAccount(), userInfo);
+    public static void setUser(User user) {
+        setUser(getActiveAccount(), user);
     }
 }

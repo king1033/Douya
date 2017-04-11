@@ -6,14 +6,16 @@
 package me.zhanghai.android.douya.broadcast.ui;
 
 import android.os.Bundle;
-import android.support.annotation.Keep;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
 import me.zhanghai.android.douya.eventbus.BroadcastUpdatedEvent;
 import me.zhanghai.android.douya.eventbus.EventBusUtils;
 import me.zhanghai.android.douya.network.api.info.apiv2.Broadcast;
-import me.zhanghai.android.douya.network.api.info.apiv2.User;
+import me.zhanghai.android.douya.network.api.info.apiv2.SimpleUser;
 import me.zhanghai.android.douya.user.ui.BaseUserAdapter;
 import me.zhanghai.android.douya.user.ui.DialogUserAdapter;
 import me.zhanghai.android.douya.user.ui.UserListFragment;
@@ -24,13 +26,14 @@ public abstract class BroadcastUserListFragment extends UserListFragment {
     // Not static because we are to be subclassed.
     private final String KEY_PREFIX = getClass().getName() + '.';
 
-    public final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
+    private final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
 
     private Broadcast mBroadcast;
 
-    protected void setArguments(Broadcast broadcast) {
+    protected BroadcastUserListFragment setArguments(Broadcast broadcast) {
         FragmentUtils.ensureArguments(this)
                 .putParcelable(EXTRA_BROADCAST, broadcast);
+        return this;
     }
 
     @Override
@@ -55,7 +58,7 @@ public abstract class BroadcastUserListFragment extends UserListFragment {
     }
 
     @Override
-    protected void onUserListUpdated(List<User> userList) {
+    protected void onUserListUpdated(List<SimpleUser> userList) {
         if (onUpdateBroadcast(mBroadcast, userList)) {
             EventBusUtils.postAsync(new BroadcastUpdatedEvent(mBroadcast, this));
         }
@@ -66,10 +69,10 @@ public abstract class BroadcastUserListFragment extends UserListFragment {
         return new DialogUserAdapter();
     }
 
-    protected abstract boolean onUpdateBroadcast(Broadcast broadcast, List<User> userList);
+    protected abstract boolean onUpdateBroadcast(Broadcast broadcast, List<SimpleUser> userList);
 
-    @Keep
-    public void onEventMainThread(BroadcastUpdatedEvent event) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBroadcastUpdated(BroadcastUpdatedEvent event) {
 
         if (event.isFromMyself(this)) {
             return;

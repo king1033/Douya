@@ -7,7 +7,6 @@ package me.zhanghai.android.douya.broadcast.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -31,6 +30,9 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import com.android.volley.VolleyError;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
@@ -71,8 +73,8 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
 
     private static final String KEY_PREFIX = BroadcastFragment.class.getName() + '.';
 
-    private static final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
     private static final String EXTRA_BROADCAST_ID = KEY_PREFIX + "broadcast_id";
+    private static final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
     private static final String EXTRA_SHOW_SEND_COMMENT = KEY_PREFIX + "show_send_comment";
     private static final String EXTRA_TITLE = KEY_PREFIX + "title";
 
@@ -162,14 +164,14 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
         mBroadcastAndCommentListResource = BroadcastAndCommentListResource.attachTo(mBroadcastId,
                 mBroadcast, this);
 
-        final AppCompatActivity activity = (AppCompatActivity) getActivity();
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
         activity.setTitle(getTitle());
         activity.setSupportActionBar(mToolbar);
 
         mContainerLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActivityCompat.finishAfterTransition(activity);
+                ActivityCompat.finishAfterTransition(getActivity());
             }
         });
         ViewCompat.setTransitionName(mSharedView, Broadcast.makeTransitionName(mBroadcastId));
@@ -481,8 +483,8 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
         updateSendCommentStatus();
     }
 
-    @Keep
-    public void onEventMainThread(BroadcastCommentSentEvent event) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBroadcastCommentSent(BroadcastCommentSentEvent event) {
 
         if (event.isFromMyself(this)) {
             return;
@@ -495,8 +497,8 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
         }
     }
 
-    @Keep
-    public void onEventMainThread(BroadcastCommentSendErrorEvent event) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBroadcastCommentSendError(BroadcastCommentSendErrorEvent event) {
 
         if (event.isFromMyself(this)) {
             return;

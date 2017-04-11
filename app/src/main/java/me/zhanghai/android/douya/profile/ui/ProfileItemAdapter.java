@@ -6,6 +6,8 @@
 package me.zhanghai.android.douya.profile.ui;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +18,18 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.zhanghai.android.douya.R;
+import me.zhanghai.android.douya.item.ui.ItemActivities;
 import me.zhanghai.android.douya.link.UriHandler;
-import me.zhanghai.android.douya.network.api.info.frodo.Item;
+import me.zhanghai.android.douya.network.api.info.frodo.CollectableItem;
 import me.zhanghai.android.douya.ui.RatioFrameLayout;
 import me.zhanghai.android.douya.ui.SimpleAdapter;
 import me.zhanghai.android.douya.util.DrawableUtils;
 import me.zhanghai.android.douya.util.ImageUtils;
 import me.zhanghai.android.douya.util.RecyclerViewUtils;
-import me.zhanghai.android.douya.util.ViewCompat;
 import me.zhanghai.android.douya.util.ViewUtils;
 
-public class ProfileItemAdapter extends SimpleAdapter<Item, ProfileItemAdapter.ViewHolder> {
+public class ProfileItemAdapter
+        extends SimpleAdapter<CollectableItem, ProfileItemAdapter.ViewHolder> {
 
     public ProfileItemAdapter() {
         setHasStableIds(true);
@@ -46,13 +49,14 @@ public class ProfileItemAdapter extends SimpleAdapter<Item, ProfileItemAdapter.V
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final Item item = getItem(position);
+        final CollectableItem item = getItem(position);
         float ratio = 1;
         switch (item.getType()) {
             case BOOK:
             case EVENT:
             case MOVIE:
-                ratio = 2f / 3;
+            case TV:
+                ratio = 2f / 3f;
                 break;
         }
         holder.itemLayout.setRatio(ratio);
@@ -61,7 +65,12 @@ public class ProfileItemAdapter extends SimpleAdapter<Item, ProfileItemAdapter.V
             @Override
             public void onClick(View view) {
                 // TODO
-                UriHandler.open(item.url, context);
+                Intent intent = ItemActivities.makeIntent(item, context);
+                if (intent != null) {
+                    context.startActivity(intent);
+                } else {
+                    UriHandler.open(item.url, context);
+                }
             }
         });
         ImageUtils.loadImage(holder.coverImage, item.cover.getLarge());

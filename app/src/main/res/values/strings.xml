@@ -27,6 +27,7 @@
     <string name="yesterday">昨天</string>
     <string name="month_day_pattern">M月d日</string>
     <string name="date_pattern">Y年M月d日</string>
+    <string name="year_month_pattern">Y年M月</string>
 
     <!-- Overrides strings in LicensesDialog. -->
     <string name="notices_title">@string/settings_open_source_licenses_title</string>
@@ -38,7 +39,6 @@
     <string name="api_error_timeout">请求超时</string>
     <string name="api_error_no_connection">无网络连接</string>
     <string name="api_error_auth_failure">认证失败</string>
-    <string name="api_error_redirect">重定向错误</string>
     <string name="api_error_server">服务器错误</string>
     <string name="api_error_network">网络错误</string>
 
@@ -108,8 +108,8 @@
     <string name="auth_title_confirm">确认密码</string>
     <string name="auth_username">用户名</string>
     <string name="auth_password">密码</string>
-    <string name="auth_log_in">登录</string>
-    <string name="auth_register">没有账户？现在注册</string>
+    <string name="auth_sign_in">登录</string>
+    <string name="auth_sign_up">没有账户？现在注册</string>
     <string name="auth_error_empty_username">请输入用户名</string>
     <string name="auth_error_empty_password">请输入密码</string>
     <string name="auth_error_invalid_response">服务器应答无效</string>
@@ -237,10 +237,15 @@
     <string name="item_movie_action">看</string>
     <string name="item_music_name">音乐</string>
     <string name="item_music_action">听</string>
+    <string name="item_tv_name">电视剧</string>
+    <string name="item_tv_action">看</string>
     <string name="item_todo_format">想%1$s</string>
     <string name="item_doing_format">在%1$s</string>
     <string name="item_done_format">%1$s过</string>
-    <string name="item_collection_title">标记条目</string>
+    <string name="item_movie_title">电影</string>
+    <string name="item_collection_title">条目收藏</string>
+    <string name="item_add_collection_title">收藏 %1$s</string>
+    <string name="item_edit_collection_title">编辑收藏 %1$s</string>
     <string name="item_state">状态</string>
     <string name="item_rating">评价</string>
     <string-array name="item_rating_hints">
@@ -261,6 +266,8 @@
     <string name="settings_auto_refresh_home_title">打开时自动刷新主页</string>
     <string name="settings_show_title_for_link_entity_title">显示完整链接文本</string>
     <string name="settings_show_title_for_link_entity_summary">替换经过 dou.bz 缩短的链接</string>
+    <string name="settings_progressive_third_party_app_title">渐进式第三方应用</string>
+    <string name="settings_progressive_third_party_app_summary">使用豆瓣官方应用打开尚未实现的页面</string>
     <string name="settings_open_url_with_title">打开链接的方式</string>
     <string name="settings_open_url_with_summary">%1$s</string>
     <string-array name="settings_open_url_with_entries">
@@ -274,6 +281,7 @@
     <string name="settings_always_copy_to_clipboard_as_text_summary">可以避免部分输入法的粘贴功能问题</string>
     <string name="settings_about_title">关于</string>
     <string name="settings_open_source_licenses_title">开放源代码许可</string>
+    <string name="settings_privacy_policy_title">隐私权政策</string>
     <string name="settings_about_douya_title">关于豆芽</string>
 
     <string name="about_title">关于</string>

@@ -11,11 +11,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatDialogFragment;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 
@@ -23,7 +23,7 @@ import me.zhanghai.android.douya.R;
 import me.zhanghai.android.douya.util.FragmentUtils;
 
 @SuppressWarnings("unused")
-public class SimpleDialogFragment extends DialogFragment {
+public class SimpleDialogFragment extends AppCompatDialogFragment {
 
     private static final String ARGUMENT_REQUEST_CODE = "request_code";
     private static final String ARGUMENT_THEME = "theme";
@@ -41,7 +41,7 @@ public class SimpleDialogFragment extends DialogFragment {
 
     public static final int REQUEST_CODE_INVALID = -1;
 
-    private SimpleDialogListener mListener;
+    private Listener mListener;
     private int mRequestCode;
 
     private static SimpleDialogFragment makeClose(int requestCode, Integer titleId, int messageId,
@@ -178,12 +178,12 @@ public class SimpleDialogFragment extends DialogFragment {
         Fragment parentFragment = getParentFragment();
         if (parentFragment == null) {
             Activity activity = getActivity();
-            if (activity instanceof SimpleDialogListenerProvider) {
-                mListener = ((SimpleDialogListenerProvider) activity).getDialogListener();
+            if (activity instanceof ListenerProvider) {
+                mListener = ((ListenerProvider) activity).getDialogListener();
             }
         } else {
-            if (parentFragment instanceof SimpleDialogListenerProvider) {
-                mListener = ((SimpleDialogListenerProvider) parentFragment).getDialogListener();
+            if (parentFragment instanceof ListenerProvider) {
+                mListener = ((ListenerProvider) parentFragment).getDialogListener();
             }
         }
         mRequestCode = getArguments().getInt(ARGUMENT_REQUEST_CODE);
@@ -320,7 +320,7 @@ public class SimpleDialogFragment extends DialogFragment {
         show(fragment.getChildFragmentManager());
     }
 
-    public static class SimpleDialogListener {
+    public static class Listener {
         public void onListItemClicked(int requestCode, int index) {}
         public void onSingleChoiceItemClicked(int requestCode, int index) {}
         public void onPositiveButtonClicked(int requestCode) {}
@@ -333,8 +333,8 @@ public class SimpleDialogFragment extends DialogFragment {
         }
     }
 
-    public interface SimpleDialogListenerProvider {
-        SimpleDialogListener getDialogListener();
+    public interface ListenerProvider {
+        Listener getDialogListener();
     }
 
     public static class Builder {

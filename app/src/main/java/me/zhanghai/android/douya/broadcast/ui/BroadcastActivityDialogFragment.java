@@ -7,7 +7,6 @@ package me.zhanghai.android.douya.broadcast.ui;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.Keep;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -20,6 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,7 +36,7 @@ public class BroadcastActivityDialogFragment extends AppCompatDialogFragment {
 
     private static final String KEY_PREFIX = BroadcastActivityDialogFragment.class.getName() + '.';
 
-    public static final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
+    private static final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
 
     @BindView(R.id.tab)
     TabLayout mTabLayout;
@@ -141,8 +143,8 @@ public class BroadcastActivityDialogFragment extends AppCompatDialogFragment {
         EventBusUtils.unregister(this);
     }
 
-    @Keep
-    public void onEventMainThread(BroadcastUpdatedEvent event) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onBroadcastUpdated(BroadcastUpdatedEvent event) {
 
         if (event.isFromMyself(this)) {
             return;

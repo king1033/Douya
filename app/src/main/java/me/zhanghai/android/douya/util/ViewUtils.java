@@ -7,6 +7,7 @@ package me.zhanghai.android.douya.util;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
@@ -14,6 +15,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
@@ -129,7 +131,7 @@ public class ViewUtils {
     }
 
     public static void crossfade(View fromView, View toView) {
-        crossfade(fromView, toView, true);
+        crossfade(fromView, toView, false);
     }
 
     public static void fadeOutThenFadeIn(final View fromView, final View toView, final int duration,
@@ -147,7 +149,7 @@ public class ViewUtils {
     }
 
     public static void fadeOutThenFadeIn(final View fromView, final View toView) {
-        fadeOutThenFadeIn(fromView, toView, true);
+        fadeOutThenFadeIn(fromView, toView, false);
     }
 
     public static float dpToPx(float dp, Context context) {
@@ -155,12 +157,26 @@ public class ViewUtils {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics);
     }
 
-    public static int dpToPxInt(float dp, Context context) {
-        return Math.round(dpToPx(dp, context));
+    public static int dpToPxOffset(float dp, Context context) {
+        return (int) dpToPx(dp, context);
+    }
+
+    public static int dpToPxSize(float dp, Context context) {
+        float value = dpToPx(dp, context);
+        int size = (int) (value + 0.5f);
+        if (size != 0) {
+            return size;
+        } else if (value == 0) {
+            return 0;
+        } else if (value > 0) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
 
     public static int getColorFromAttrRes(int attrRes, int defValue, Context context) {
-        int[] attrs = new int[] {attrRes};
+        int[] attrs = new int[] { attrRes };
         TypedArray a = context.obtainStyledAttributes(attrs);
         int color = a.getColor(0, defValue);
         a.recycle();
@@ -168,7 +184,7 @@ public class ViewUtils {
     }
 
     public static ColorStateList getColorStateListFromAttrRes(int attrRes, Context context) {
-        int[] attrs = new int[] {attrRes};
+        int[] attrs = new int[] { attrRes };
         // TODO: Switch to TintTypedArray when they added this overload.
         TypedArray a = context.obtainStyledAttributes(attrs);
         // 0 is an invalid identifier according to the docs of {@link Resources}.
@@ -182,7 +198,7 @@ public class ViewUtils {
     }
 
     public static Drawable getDrawableFromAttrRes(int attrRes, Context context) {
-        int[] attrs = new int[] {attrRes};
+        int[] attrs = new int[] { attrRes };
         // TODO: Switch to TintTypedArray when they added this overload.
         TypedArray a = context.obtainStyledAttributes(attrs);
         // 0 is an invalid identifier according to the docs of {@link Resources}.
@@ -193,6 +209,15 @@ public class ViewUtils {
         }
         a.recycle();
         return drawable;
+    }
+
+    public static int getResIdFromAttrRes(int attrRes, int defValue, Context context) {
+        int[] attrs = new int[] { attrRes };
+        // TODO: Switch to TintTypedArray when they added this overload.
+        TypedArray a = context.obtainStyledAttributes(attrs);
+        int resId = a.getResourceId(0, defValue);
+        a.recycle();
+        return resId;
     }
 
     public static int getShortAnimTime(Resources resources) {
@@ -261,7 +286,6 @@ public class ViewUtils {
 
     public static void hideTextInputLayoutErrorOnTextChange(EditText editText,
                                                             final TextInputLayout textInputLayout) {
-
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -345,6 +369,17 @@ public class ViewUtils {
         layoutParams.width = size;
         layoutParams.height = size;
         view.setLayoutParams(layoutParams);
+    }
+
+    public static void setLayoutFullscreen(View view) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            view.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+    }
+
+    public static void setLayoutFullscreen(Activity activity) {
+        setLayoutFullscreen(activity.getWindow().getDecorView());
     }
 
     public static void setTextViewBold(TextView textView, boolean bold) {

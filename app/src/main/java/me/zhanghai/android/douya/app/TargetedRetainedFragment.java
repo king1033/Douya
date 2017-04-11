@@ -19,11 +19,9 @@ public class TargetedRetainedFragment extends RetainedFragment {
 
     private static final String KEY_PREFIX = TargetedRetainedFragment.class.getName() + '.';
 
-    public static final String EXTRA_TARGETED_AT_ACTIVITY = KEY_PREFIX + "targeted_at_activity";
-    public static final String EXTRA_TARGET_FRAGMENT_WHO = KEY_PREFIX + "target_fragment_who";
-    public static final String EXTRA_REQUEST_CODE = KEY_PREFIX + "request_code";
+    private static final String EXTRA_TARGET_FRAGMENT_WHO = KEY_PREFIX + "target_fragment_who";
+    private static final String EXTRA_REQUEST_CODE = KEY_PREFIX + "request_code";
 
-    private boolean mTargetedAtActivity;
     private Fragment mTargetFragment;
     private int mRequestCode = REQUEST_CODE_INVALID;
 
@@ -32,11 +30,7 @@ public class TargetedRetainedFragment extends RetainedFragment {
      */
     public void detach() {
 
-        // Not needed if we are targeted at an activity.
-        if (mTargetedAtActivity) {
-            return;
-        }
-
+        // TODO: Safe transaction: delay until onResumed() or some where safe?
         // In case we did not reach onActivityCreated().
         if (getActivity() != null) {
             findTargetFragmentIf();
@@ -54,34 +48,21 @@ public class TargetedRetainedFragment extends RetainedFragment {
         }
     }
 
-    protected void targetAtActivity(int requestCode) {
+    protected void targetAt(Fragment fragment, int requestCode) {
         Bundle arguments = FragmentUtils.ensureArguments(this);
-        arguments.putBoolean(EXTRA_TARGETED_AT_ACTIVITY, true);
-        arguments.putInt(EXTRA_REQUEST_CODE, requestCode);
-    }
-
-    protected void targetAtActivity() {
-        targetAtActivity(REQUEST_CODE_INVALID);
-    }
-
-    protected void targetAtFragment(Fragment fragment, int requestCode) {
-        Bundle arguments = FragmentUtils.ensureArguments(this);
-        arguments.putBoolean(EXTRA_TARGETED_AT_ACTIVITY, false);
         arguments.putString(EXTRA_TARGET_FRAGMENT_WHO, FriendlyFragment.getWho(fragment));
         arguments.putInt(EXTRA_REQUEST_CODE, requestCode);
     }
 
-    protected void targetAtFragment(Fragment fragment) {
-        targetAtFragment(fragment, REQUEST_CODE_INVALID);
+    protected void targetAt(Fragment fragment) {
+        targetAt(fragment, REQUEST_CODE_INVALID);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Bundle arguments = getArguments();
-        mTargetedAtActivity = arguments.getBoolean(EXTRA_TARGETED_AT_ACTIVITY);
-        mRequestCode = arguments.getInt(EXTRA_REQUEST_CODE);
+        mRequestCode = getArguments().getInt(EXTRA_REQUEST_CODE);
     }
 
     @Override
@@ -97,7 +78,7 @@ public class TargetedRetainedFragment extends RetainedFragment {
     // The timing of calling this method can be tricky; However in most cases it will work.
     private void findTargetFragmentIf() {
 
-        if (mTargetedAtActivity || mTargetFragment != null) {
+        if (mTargetFragment != null) {
             return;
         }
 
@@ -118,13 +99,9 @@ public class TargetedRetainedFragment extends RetainedFragment {
         mTargetFragment = null;
     }
 
-    protected Object getTarget() {
-        if (mTargetedAtActivity) {
-            return getActivity();
-        } else {
-            findTargetFragmentIf();
-            return mTargetFragment;
-        }
+    protected Fragment getTarget() {
+        findTargetFragmentIf();
+        return mTargetFragment;
     }
 
     protected boolean hasRequestCode() {

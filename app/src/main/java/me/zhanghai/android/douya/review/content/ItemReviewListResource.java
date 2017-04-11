@@ -18,7 +18,7 @@ public class ItemReviewListResource extends BaseReviewListResource {
 
     private static final String KEY_PREFIX = ItemReviewListResource.class.getName() + '.';
 
-    public static final String EXTRA_ITEM_ID = KEY_PREFIX + "item_id";
+    private static final String EXTRA_ITEM_ID = KEY_PREFIX + "item_id";
 
     private long mItemId;
 
@@ -26,43 +26,23 @@ public class ItemReviewListResource extends BaseReviewListResource {
 
     private static ItemReviewListResource newInstance(long itemId) {
         //noinspection deprecation
-        ItemReviewListResource resource = new ItemReviewListResource();
-        resource.setArguments(itemId);
-        return resource;
-    }
-
-    public static ItemReviewListResource attachTo(long itemId, FragmentActivity activity,
-                                                  String tag, int requestCode) {
-        return attachTo(itemId, activity, tag, true, null, requestCode);
-    }
-
-    public static ItemReviewListResource attachTo(long itemId, FragmentActivity activity) {
-        return attachTo(itemId, activity, FRAGMENT_TAG_DEFAULT, REQUEST_CODE_INVALID);
+        return new ItemReviewListResource().setArguments(itemId);
     }
 
     public static ItemReviewListResource attachTo(long itemId, Fragment fragment, String tag,
                                                   int requestCode) {
-        return attachTo(itemId, fragment.getActivity(), tag, false, fragment, requestCode);
+        FragmentActivity activity = fragment.getActivity();
+        ItemReviewListResource instance = FragmentUtils.findByTag(activity, tag);
+        if (instance == null) {
+            instance = newInstance(itemId);
+            instance.targetAt(fragment, requestCode);
+            FragmentUtils.add(instance, activity, tag);
+        }
+        return instance;
     }
 
     public static ItemReviewListResource attachTo(long itemId, Fragment fragment) {
         return attachTo(itemId, fragment, FRAGMENT_TAG_DEFAULT, REQUEST_CODE_INVALID);
-    }
-
-    private static ItemReviewListResource attachTo(long itemId, FragmentActivity activity,
-                                                   String tag, boolean targetAtActivity,
-                                                   Fragment targetFragment, int requestCode) {
-        ItemReviewListResource resource = FragmentUtils.findByTag(activity, tag);
-        if (resource == null) {
-            resource = newInstance(itemId);
-            if (targetAtActivity) {
-                resource.targetAtActivity(requestCode);
-            } else {
-                resource.targetAtFragment(targetFragment, requestCode);
-            }
-            FragmentUtils.add(resource, activity, tag);
-        }
-        return resource;
     }
 
     /**
@@ -70,9 +50,10 @@ public class ItemReviewListResource extends BaseReviewListResource {
      */
     public ItemReviewListResource() {}
 
-    private void setArguments(long itemId) {
+    protected ItemReviewListResource setArguments(long itemId) {
         FragmentUtils.ensureArguments(this)
                 .putLong(EXTRA_ITEM_ID, itemId);
+        return this;
     }
 
     @Override

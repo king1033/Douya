@@ -8,6 +8,8 @@
 
 ![Travis CI](https://travis-ci.org/DreaminginCodeZH/Douya.svg)
 
+<a href="https://play.google.com/store/apps/details?id=me.zhanghai.android.douya" target="_blank"><img alt="Google Play" height="90" src="https://play.google.com/intl/zh_CN/badges/images/generic/zh-cn_badge_web_generic.png"/></a>
+
 [豆芽 CI 构建](https://github.com/DreaminginCodeZH/DouyaCiBuilds)
 
 [豆芽 API Key 设置向导](https://github.com/DreaminginCodeZH/DouyaApiKey)
@@ -230,7 +232,7 @@ APK 文件可以在本项目的 [Releases](https://github.com/DreaminginCodeZH/D
 
 1. 创建 `signing.properties`：
 
-    ```ini
+```ini
 storeFile=YOUR_STORE_FILE
 storePassword=
 keyAlias=

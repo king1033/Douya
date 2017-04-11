@@ -6,6 +6,7 @@
 package me.zhanghai.android.douya.account.ui;
 
 import android.accounts.Account;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,17 +16,24 @@ import me.zhanghai.android.douya.account.util.AccountUtils;
 import me.zhanghai.android.douya.ui.SimpleDialogFragment;
 
 public class SelectAccountActivity extends AppCompatActivity
-        implements SimpleDialogFragment.SimpleDialogListenerProvider {
+        implements SimpleDialogFragment.ListenerProvider {
 
-    public static final String EXTRA_ON_SELECTED_INTENT = SelectAccountActivity.class.getName()
-            + ".on_selected_intent";
+    private static final String KEY_PREFIX = SelectAccountActivity.class.getName() + '.';
 
-    private SimpleDialogFragment.SimpleDialogListener mDialogListener;
+    private static final String EXTRA_ON_SELECTED_INTENT = KEY_PREFIX + "on_selected_intent";
+
+    private SimpleDialogFragment.Listener mDialogListener;
+
+    public static Intent makeIntent(Intent onSelectedIntent, Context context) {
+        return new Intent(context, SelectAccountActivity.class)
+                .putExtra(SelectAccountActivity.EXTRA_ON_SELECTED_INTENT, onSelectedIntent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // FIXME: Account list might change; don't use SimpleDialogFragment.
         final Account[] accounts = AccountUtils.getAccounts();
         int numAccounts = accounts.length;
         String[] accountNames = new String[numAccounts];
@@ -33,7 +41,7 @@ public class SelectAccountActivity extends AppCompatActivity
             accountNames[i] = accounts[i].name;
         }
 
-        mDialogListener = new SimpleDialogFragment.SimpleDialogListener() {
+        mDialogListener = new SimpleDialogFragment.Listener() {
             @Override
             public void onSingleChoiceItemClicked(int requestCode, int index) {
                 AccountUtils.setActiveAccount(accounts[index]);
@@ -61,7 +69,7 @@ public class SelectAccountActivity extends AppCompatActivity
     }
 
     @Override
-    public SimpleDialogFragment.SimpleDialogListener getDialogListener() {
+    public SimpleDialogFragment.Listener getDialogListener() {
         return mDialogListener;
     }
 }

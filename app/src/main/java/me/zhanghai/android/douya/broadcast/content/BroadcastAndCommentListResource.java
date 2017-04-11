@@ -15,18 +15,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import me.zhanghai.android.douya.content.ResourceFragment;
+import me.zhanghai.android.douya.app.TargetedRetainedFragment;
 import me.zhanghai.android.douya.network.api.info.apiv2.Broadcast;
 import me.zhanghai.android.douya.network.api.info.apiv2.Comment;
 import me.zhanghai.android.douya.util.FragmentUtils;
 
-public class BroadcastAndCommentListResource extends ResourceFragment
+public class BroadcastAndCommentListResource extends TargetedRetainedFragment
         implements BroadcastResource.Listener, BroadcastCommentListResource.Listener {
 
     private static final String KEY_PREFIX = BroadcastAndCommentListResource.class.getName() + '.';
 
-    public static final String EXTRA_BROADCAST_ID = KEY_PREFIX + "broadcast_id";
-    public static final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
+    private static final String EXTRA_BROADCAST_ID = KEY_PREFIX + "broadcast_id";
+    private static final String EXTRA_BROADCAST = KEY_PREFIX + "broadcast";
 
     private static final int BROADCAST_ID_INVALID = -1;
 
@@ -44,28 +44,20 @@ public class BroadcastAndCommentListResource extends ResourceFragment
     private static BroadcastAndCommentListResource newInstance(long broadcastId,
                                                                Broadcast broadcast) {
         //noinspection deprecation
-        BroadcastAndCommentListResource resource = new BroadcastAndCommentListResource();
-        resource.setArguments(broadcastId, broadcast);
-        return resource;
-    }
-
-    public static BroadcastAndCommentListResource attachTo(long broadcastId, Broadcast broadcast,
-                                                           FragmentActivity activity, String tag,
-                                                           int requestCode) {
-        return attachTo(broadcastId, broadcast, activity, tag, true, null, requestCode);
-    }
-
-    public static BroadcastAndCommentListResource attachTo(long broadcastId, Broadcast broadcast,
-                                                           FragmentActivity activity) {
-        return attachTo(broadcastId, broadcast, activity, FRAGMENT_TAG_DEFAULT,
-                REQUEST_CODE_INVALID);
+        return new BroadcastAndCommentListResource().setArguments(broadcastId, broadcast);
     }
 
     public static BroadcastAndCommentListResource attachTo(long broadcastId, Broadcast broadcast,
                                                            Fragment fragment, String tag,
                                                            int requestCode) {
-        return attachTo(broadcastId, broadcast, fragment.getActivity(), tag, false, fragment,
-                requestCode);
+        FragmentActivity activity = fragment.getActivity();
+        BroadcastAndCommentListResource instance = FragmentUtils.findByTag(activity, tag);
+        if (instance == null) {
+            instance = newInstance(broadcastId, broadcast);
+            instance.targetAt(fragment, requestCode);
+            FragmentUtils.add(instance, activity, tag);
+        }
+        return instance;
     }
 
     public static BroadcastAndCommentListResource attachTo(long broadcastId, Broadcast broadcast,
@@ -74,33 +66,16 @@ public class BroadcastAndCommentListResource extends ResourceFragment
                 REQUEST_CODE_INVALID);
     }
 
-    private static BroadcastAndCommentListResource attachTo(long broadcastId, Broadcast broadcast,
-                                                            FragmentActivity activity, String tag,
-                                                            boolean targetAtActivity,
-                                                            Fragment targetFragment,
-                                                            int requestCode) {
-        BroadcastAndCommentListResource resource = FragmentUtils.findByTag(activity, tag);
-        if (resource == null) {
-            resource = newInstance(broadcastId, broadcast);
-            if (targetAtActivity) {
-                resource.targetAtActivity(requestCode);
-            } else {
-                resource.targetAtFragment(targetFragment, requestCode);
-            }
-            FragmentUtils.add(resource, activity, tag);
-        }
-        return resource;
-    }
-
     /**
      * @deprecated Use {@code attachTo()} instead.
      */
     public BroadcastAndCommentListResource() {}
 
-    protected void setArguments(long broadcastId, Broadcast broadcast) {
+    protected BroadcastAndCommentListResource setArguments(long broadcastId, Broadcast broadcast) {
         Bundle arguments = FragmentUtils.ensureArguments(this);
         arguments.putLong(EXTRA_BROADCAST_ID, broadcastId);
         arguments.putParcelable(EXTRA_BROADCAST, broadcast);
+        return this;
     }
 
     @Override

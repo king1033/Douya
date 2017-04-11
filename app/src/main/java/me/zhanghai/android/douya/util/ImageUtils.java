@@ -15,7 +15,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import me.zhanghai.android.douya.R;
-import me.zhanghai.android.douya.network.api.info.apiv2.Image;
+import me.zhanghai.android.douya.network.api.info.frodo.Image;
+import me.zhanghai.android.douya.network.api.info.frodo.ImageWithSize;
+import me.zhanghai.android.douya.network.api.info.frodo.Photo;
 import me.zhanghai.android.douya.ui.RatioImageView;
 
 public class ImageUtils {
@@ -99,14 +101,25 @@ public class ImageUtils {
                 .into(view);
     }
 
-    public static void loadImage(RatioImageView view, Image image) {
-        view.setRatio(image.width, image.height);
+    public static void loadImage(ImageView view, Image image) {
         Glide.with(view.getContext())
-                .load(image.medium)
-                // dontTransform() is required for our RatioImageView to work correctly.
+                .load(image.getNormal())
                 .dontTransform()
                 .placeholder(android.R.color.transparent)
                 .into(view);
+    }
+
+    public static void loadImage(ImageView view, ImageWithSize image) {
+        ImageWithSize.Item imageItem = image.getNormal();
+        Glide.with(view.getContext())
+                .load(imageItem.url)
+                .dontTransform()
+                .placeholder(android.R.color.transparent)
+                .into(view);
+    }
+
+    public static void loadImage(ImageView view, Photo photo) {
+        loadImage(view, photo.image);
     }
 
     public static void loadImage(ImageView view, String url,
@@ -121,5 +134,31 @@ public class ImageUtils {
 
     public static void loadImage(ImageView view, String url) {
         loadImage(view, url, null);
+    }
+
+    public static void loadImageWithRatio(RatioImageView view, ImageWithSize image) {
+        ImageWithSize.Item imageItem = image.getNormal();
+        view.setRatio(imageItem.width, imageItem.height);
+        Glide.with(view.getContext())
+                .load(imageItem.url)
+                // dontTransform() is required for our RatioImageView to work correctly.
+                .dontTransform()
+                .placeholder(android.R.color.transparent)
+                .into(view);
+    }
+
+    public static void loadImageWithRatio(RatioImageView view, Photo photo) {
+        loadImageWithRatio(view, photo.image);
+    }
+
+    public static void loadImageWithRatio(RatioImageView view,
+                                          me.zhanghai.android.douya.network.api.info.apiv2.Image image) {
+        view.setRatio(image.width, image.height);
+        Glide.with(view.getContext())
+                .load(image.medium)
+                // dontTransform() is required for our RatioImageView to work correctly.
+                .dontTransform()
+                .placeholder(android.R.color.transparent)
+                .into(view);
     }
 }

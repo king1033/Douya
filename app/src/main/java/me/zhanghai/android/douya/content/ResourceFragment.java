@@ -5,33 +5,94 @@
 
 package me.zhanghai.android.douya.content;
 
-import android.accounts.Account;
-import android.os.Bundle;
+import com.android.volley.VolleyError;
 
-import me.zhanghai.android.douya.account.util.AccountUtils;
-import me.zhanghai.android.douya.app.TargetedRetainedFragment;
-import me.zhanghai.android.douya.util.FragmentUtils;
+import org.greenrobot.eventbus.Subscribe;
 
-public class ResourceFragment extends TargetedRetainedFragment {
+import me.zhanghai.android.douya.eventbus.EventBusUtils;
+import me.zhanghai.android.douya.eventbus.PreventNoSubscriptionExceptionEvent;
+import me.zhanghai.android.douya.network.Request;
+import me.zhanghai.android.douya.network.RequestFragment;
 
-    // Not static because we are to be subclassed.
-    protected final String KEY_PREFIX = getClass().getName() + '.';
+public abstract class ResourceFragment<ResponseType, ResourceType>
+        extends RequestFragment<Void, ResponseType> {
 
-    private final String EXTRA_ACCOUNT = KEY_PREFIX + "account";
+    ResourceType mResource;
 
-    private Account mAccount;
+    public boolean has() {
+        return get() != null;
+    }
+
+    public ResourceType get() {
+        return mResource;
+    }
+
+    protected void set(ResourceType resource) {
+        mResource = resource;
+    }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public final boolean isRequesting() {
+        throw new UnsupportedOperationException("Use isLoading() instead");
+    }
 
-        Bundle arguments = FragmentUtils.ensureArguments(this);
-        if (arguments.containsKey(EXTRA_ACCOUNT)) {
-            mAccount = arguments.getParcelable(EXTRA_ACCOUNT);
-        } else {
-            mAccount = AccountUtils.getActiveAccount();
+    public boolean isLoading() {
+        return super.isRequesting();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        EventBusUtils.register(this);
+
+        loadOnStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        EventBusUtils.unregister(this);
+    }
+
+    protected void loadOnStart() {
+        if (!has()) {
+            onLoadOnStart();
         }
     }
 
-    // TODO
+    protected void onLoadOnStart() {
+        load();
+    }
+
+    public void load() {
+        start(null);
+    }
+
+    @Override
+    protected final Request<ResponseType> onCreateRequest(Void requestState) {
+        return onCreateRequest();
+    }
+
+    protected abstract Request<ResponseType> onCreateRequest();
+
+    @Override
+    protected final void onRequestStarted() {
+        onLoadStarted();
+    }
+
+    protected abstract void onLoadStarted();
+
+    @Override
+    protected void onRequestFinished(boolean successful, Void requestState, ResponseType response,
+                                     VolleyError error) {
+        onLoadFinished(successful, response, error);
+    }
+
+    protected abstract void onLoadFinished(boolean successful, ResponseType response,
+                                           VolleyError error);
+
+    @Subscribe
+    public final void onPreventNoSubscriptionException(PreventNoSubscriptionExceptionEvent event) {}
 }

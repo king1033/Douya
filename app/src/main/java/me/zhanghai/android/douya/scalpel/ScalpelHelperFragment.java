@@ -7,11 +7,13 @@ package me.zhanghai.android.douya.scalpel;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Keep;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import me.zhanghai.android.douya.app.RetainedFragment;
 import me.zhanghai.android.douya.eventbus.EventBusUtils;
@@ -96,8 +98,8 @@ public class ScalpelHelperFragment extends RetainedFragment {
         ScalpelUtils.setEnabled(getActivity(), true);
     }
 
-    @Keep
-    public void onEventMainThread(SetEnabledEvent event) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSetEnabled(SetEnabledEvent event) {
         setEnabledForActivity(event.enabled);
     }
 

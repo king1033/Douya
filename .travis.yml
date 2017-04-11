@@ -7,7 +7,7 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-25
+    - build-tools-25.0.2
     - android-25
     - extra-android-m2repository
 
@@ -32,4 +32,4 @@ after_success:
   - ./upload-to-releases.sh 'DreaminginCodeZH/DouyaCiBuilds' "${version}" "${description}" "douya-ci-${version}.apk"
 
 after_failure:
-  - cat app/build/outputs/lint-results-*.html
+  - cat app/build/reports/lint-results*.html

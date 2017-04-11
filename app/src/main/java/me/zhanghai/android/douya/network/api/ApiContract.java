@@ -21,6 +21,7 @@ public interface ApiContract {
             String CLIENT_SECRET = "client_secret";
             String REDIRECT_URI = "redirect_uri";
             interface RedirectUris {
+                String API_V2 = "http://shuo.douban.com/!service/android";
                 String FRODO = "frodo://app/oauth/callback/";
             }
             String GRANT_TYPE = "grant_type";
@@ -42,7 +43,7 @@ public interface ApiContract {
         interface Frodo {
 
             // API protocol version is derived from user agent string.
-            String USER_AGENT = "api-client/Volley/1 com.douban.frodo/4.4.0(81) Android/"
+            String USER_AGENT = "api-client/Volley/1 com.douban.frodo/4.11.0(90) Android/"
                     + Build.VERSION.SDK_INT+ " " + Build.PRODUCT + " " + Build.MANUFACTURER + " "
                     + Build.MODEL + "  rom:android";
 
@@ -87,6 +88,10 @@ public interface ApiContract {
                 String COUNT = "count";
             }
 
+            interface Movie {
+                String URL_FORMAT = API_HOST + "movie/%d";
+            }
+
             interface ItemReviewList {
 
                 String URL_FORMAT = API_HOST + "subject/%d/reviews";
@@ -97,6 +102,10 @@ public interface ApiContract {
         }
 
         interface ApiV2 {
+
+            String USER_AGENT = "api-client/2.0 com.douban.shuo/2.2.7(123) Android/"
+                    + Build.VERSION.SDK_INT + " " + Build.PRODUCT + " " + Build.MANUFACTURER + " "
+                    + Build.MODEL;
 
             String API_HOST = "https://api.douban.com/v2/";
 
@@ -112,7 +121,7 @@ public interface ApiContract {
                 }
             }
 
-            interface UserInfo {
+            interface User {
 
                 String URL_FORMAT = API_HOST + "lifestream/user/%s";
 

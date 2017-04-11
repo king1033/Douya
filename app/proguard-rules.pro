@@ -17,10 +17,12 @@
 #}
 
 # EventBus
+-keepattributes *Annotation*
 -keepclassmembers class ** {
-    public void onEvent*(**);
+    @org.greenrobot.eventbus.Subscribe <methods>;
 }
--keepclassmembers class * extends de.greenrobot.event.util.ThrowableFailureEvent {
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
+-keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
     <init>(java.lang.Throwable);
 }
 
@@ -30,6 +32,8 @@
     **[] $VALUES;
     public *;
 }
+# For DexGuard only
+#-keepresourcexmlelements manifest/application/meta-data@value=GlideModule
 
 # Gson
 -keepattributes Signature
@@ -40,3 +44,8 @@
 #-keep class com.google.gson.stream.** { *; }
 # Application classes that will be serialized/deserialized over Gson
 -keep class me.zhanghai.android.douya.network.api.info.** { *; }
+# Prevent proguard from stripping interface information from TypeAdapterFactory,
+# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer

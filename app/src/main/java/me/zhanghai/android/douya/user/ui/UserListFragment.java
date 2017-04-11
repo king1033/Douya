@@ -25,7 +25,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.zhanghai.android.douya.R;
 import me.zhanghai.android.douya.network.api.ApiError;
-import me.zhanghai.android.douya.network.api.info.apiv2.User;
+import me.zhanghai.android.douya.network.api.info.apiv2.SimpleUser;
 import me.zhanghai.android.douya.ui.LoadMoreAdapter;
 import me.zhanghai.android.douya.ui.NoChangeAnimationItemAnimator;
 import me.zhanghai.android.douya.ui.OnVerticalScrollListener;
@@ -46,7 +46,7 @@ public abstract class UserListFragment extends Fragment implements BaseUserListR
     private BaseUserAdapter mUserAdapter;
     private LoadMoreAdapter mAdapter;
 
-    private BaseUserListResource mUserListResource;
+    private BaseUserListResource<?> mUserListResource;
 
     @Nullable
     @Override
@@ -103,15 +103,15 @@ public abstract class UserListFragment extends Fragment implements BaseUserListR
         mUserListResource.detach();
     }
 
-    protected abstract BaseUserListResource onAttachUserListResource();
+    protected abstract BaseUserListResource<?> onAttachUserListResource();
 
     @Override
-    public void onLoadUserListStarted(int requestCode, boolean loadMore) {
+    public void onLoadUserListStarted(int requestCode) {
         updateRefreshing();
     }
 
     @Override
-    public void onLoadUserListFinished(int requestCode, boolean loadMore) {
+    public void onLoadUserListFinished(int requestCode) {
         updateRefreshing();
     }
 
@@ -123,14 +123,14 @@ public abstract class UserListFragment extends Fragment implements BaseUserListR
     }
 
     @Override
-    public void onUserListChanged(int requestCode, List<User> newUserList) {
+    public void onUserListChanged(int requestCode, List<SimpleUser> newUserList) {
         mUserAdapter.replace(newUserList);
         //noinspection unchecked
         onUserListUpdated(mUserListResource.get());
     }
 
     @Override
-    public void onUserListAppended(int requestCode, List<User> appendedUserList) {
+    public void onUserListAppended(int requestCode, List<SimpleUser> appendedUserList) {
         mUserAdapter.addAll(appendedUserList);
         //noinspection unchecked
         onUserListUpdated(mUserListResource.get());
@@ -138,7 +138,7 @@ public abstract class UserListFragment extends Fragment implements BaseUserListR
 
     abstract protected BaseUserAdapter onCreateAdapter();
 
-    protected void onUserListUpdated(List<User> userList) {}
+    protected void onUserListUpdated(List<SimpleUser> userList) {}
 
     private void updateRefreshing() {
         boolean loading = mUserListResource.isLoading();
