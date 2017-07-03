@@ -85,6 +85,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:stateListAnimator="@null"
+            android:textAppearance="?android:textAppearanceButton"
+            android:theme="?darkTheme"
             style="@style/Widget.AppCompat.Button.Colored" />
 
         <Button
@@ -92,6 +95,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:stateListAnimator="@null"
+            android:textAppearance="?android:textAppearanceButton"
+            android:theme="?darkTheme"
             style="@style/Widget.AppCompat.Button.Colored" />
 
         <Button
@@ -99,6 +105,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:stateListAnimator="@null"
+            android:textAppearance="?android:textAppearanceButton"
+            android:theme="?darkTheme"
             style="@style/Widget.AppCompat.Button.Colored" />
     </LinearLayout>
 </LinearLayout>

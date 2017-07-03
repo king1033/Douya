@@ -15,6 +15,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".DouyaApplication"
@@ -49,7 +50,7 @@
             android:label="@string/webview_title" />
 
         <activity
-            android:name=".ui.GalleryActivity"
+            android:name=".gallery.ui.GalleryActivity"
             android:label="@string/gallery_title"
             android:theme="@style/Theme.Douya.Gallery" />
 
@@ -136,6 +137,8 @@
 
         <service android:name=".content.ResourceWriterService" />
 
+        <service android:name=".gallery.app.SaveImageService" />
+
         <receiver
             android:name=".network.api.credential.SetApiCredentialReceiver"
             tools:ignore="ExportedReceiver">
@@ -144,9 +147,15 @@
             </intent-filter>
         </receiver>
 
-        <meta-data
-            android:name="me.zhanghai.android.douya.ui.GlideConfiguration"
-            android:value="GlideModule" />
+        <provider
+            android:name=".app.ImageTypeFileProvider"
+            android:authorities="@string/file_provider_authority"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_provider_paths" />
+        </provider>
 
         <meta-data
             android:name="io.fabric.ApiKey"

@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import me.zhanghai.android.douya.R;
 import me.zhanghai.android.douya.broadcast.content.LikeBroadcastManager;
 import me.zhanghai.android.douya.broadcast.content.RebroadcastBroadcastManager;
+import me.zhanghai.android.douya.gallery.ui.GalleryActivity;
 import me.zhanghai.android.douya.link.UriHandler;
 import me.zhanghai.android.douya.network.api.info.apiv2.Attachment;
 import me.zhanghai.android.douya.network.api.info.apiv2.Broadcast;
@@ -36,7 +37,6 @@ import me.zhanghai.android.douya.network.api.info.apiv2.Image;
 import me.zhanghai.android.douya.network.api.info.apiv2.Photo;
 import me.zhanghai.android.douya.profile.ui.ProfileActivity;
 import me.zhanghai.android.douya.ui.CardIconButton;
-import me.zhanghai.android.douya.ui.GalleryActivity;
 import me.zhanghai.android.douya.ui.HorizontalImageAdapter;
 import me.zhanghai.android.douya.ui.ImageLayout;
 import me.zhanghai.android.douya.ui.OnHorizontalScrollListener;
@@ -61,6 +61,10 @@ public class BroadcastLayout extends LinearLayout {
     TextView mNameText;
     @BindView(R.id.time_action)
     TimeActionTextView mTimeActionText;
+    @BindView(R.id.text_space)
+    Space mTextSpace;
+    @BindView(R.id.text)
+    TextView mTextText;
     @BindView(R.id.attachment)
     RelativeLayout mAttachmentLayout;
     @BindView(R.id.attachment_image)
@@ -79,10 +83,6 @@ public class BroadcastLayout extends LinearLayout {
     TextView mImageListDescriptionText;
     @BindView(R.id.image_list)
     RecyclerView mImageList;
-    @BindView(R.id.text_space)
-    Space mTextSpace;
-    @BindView(R.id.text)
-    TextView mTextText;
     @BindView(R.id.like)
     CardIconButton mLikeButton;
     @BindView(R.id.comment)
@@ -172,7 +172,7 @@ public class BroadcastLayout extends LinearLayout {
 
         if (broadcast.isInterest) {
             mAvatarImage.setImageDrawable(ContextCompat.getDrawable(context,
-                    R.drawable.recommendation_avatar_icon_grey600_40dp));
+                    R.drawable.recommendation_avatar_icon_40dp));
             mAvatarImage.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -195,6 +195,8 @@ public class BroadcastLayout extends LinearLayout {
         boolean isRebind = mBoundBroadcastId != null && mBoundBroadcastId == broadcast.id;
         // HACK: Attachment and text should not change on rebind.
         if (!isRebind) {
+
+            mTextText.setText(broadcast.getTextWithEntities(context));
 
             Attachment attachment = broadcast.attachment;
             if (attachment != null) {
@@ -258,7 +260,6 @@ public class BroadcastLayout extends LinearLayout {
             boolean textSpaceVisible = (attachment != null || numImages > 0)
                     && !TextUtils.isEmpty(broadcast.text);
             ViewUtils.setVisibleOrGone(mTextSpace, textSpaceVisible);
-            mTextText.setText(broadcast.getTextWithEntities(context));
         }
 
         mLikeButton.setText(broadcast.getLikeCountString());

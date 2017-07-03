@@ -27,11 +27,11 @@ import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.zhanghai.android.douya.R;
 import me.zhanghai.android.douya.followship.content.FollowUserManager;
+import me.zhanghai.android.douya.gallery.ui.GalleryActivity;
 import me.zhanghai.android.douya.network.api.info.apiv2.SimpleUser;
 import me.zhanghai.android.douya.network.api.info.apiv2.User;
 import me.zhanghai.android.douya.profile.util.ProfileUtils;
 import me.zhanghai.android.douya.ui.FlexibleSpaceHeaderView;
-import me.zhanghai.android.douya.ui.GalleryActivity;
 import me.zhanghai.android.douya.ui.JoinedAtLocationAutoGoneTextView;
 import me.zhanghai.android.douya.ui.WhiteIndeterminateProgressIconDrawable;
 import me.zhanghai.android.douya.util.AppUtils;
@@ -248,7 +248,7 @@ public class ProfileHeaderLayout extends FrameLayout implements FlexibleSpaceHea
     public void scrollTo(int scroll) {
 
         int scrollExtent = getScrollExtent();
-        scroll = MathUtils.clamp(scroll, 0, scrollExtent);
+        scroll = MathUtils.constrain(scroll, 0, scrollExtent);
         if (mScroll == scroll) {
             return;
         }

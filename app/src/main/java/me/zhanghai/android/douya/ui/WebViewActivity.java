@@ -19,9 +19,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
@@ -29,7 +27,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +44,7 @@ import me.zhanghai.android.douya.network.Http;
 import me.zhanghai.android.douya.network.api.credential.ApiCredential;
 import me.zhanghai.android.douya.settings.info.Settings;
 import me.zhanghai.android.douya.util.ClipboardUtils;
+import me.zhanghai.android.douya.util.IntentUtils;
 import me.zhanghai.android.douya.util.StringUtils;
 import me.zhanghai.android.douya.util.ToastUtils;
 import me.zhanghai.android.douya.util.UrlUtils;
@@ -59,6 +57,9 @@ public class WebViewActivity extends AppCompatActivity {
     private static final String DOUBAN_OAUTH2_REDIRECT_URL_FORMAT =
             "https://www.douban.com/accounts/auth2_redir?url=%1$s&apikey=%2$s";
 
+    @BindDimen(R.dimen.toolbar_height)
+    int mToolbarHeight;
+
     @BindView(R.id.appBarWrapper)
     AppBarWrapperLayout mAppbarWrapperLayout;
     @BindView(R.id.toolbar)
@@ -67,12 +68,9 @@ public class WebViewActivity extends AppCompatActivity {
     ProgressBar mProgress;
     @BindView(R.id.web)
     WebView mWebView;
-    @BindView(R.id.error)
-    TextView mErrorText;
 
-    @BindDimen(R.dimen.toolbar_height)
-    int mToolbarHeight;
-
+    private MenuItem mGoForwardMenuItem;
+    private MenuItem mOpenWithNativeMenuItem;
     private boolean mProgressVisible;
 
     public static Intent makeIntent(Uri uri, Context context) {
@@ -82,9 +80,6 @@ public class WebViewActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.webview_activity);
@@ -120,10 +115,14 @@ public class WebViewActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
 
         getMenuInflater().inflate(R.menu.webview, menu);
-
-        return super.onCreateOptionsMenu(menu);
+        mGoForwardMenuItem = menu.findItem(R.id.action_go_forward);
+        updateGoForward();
+        mOpenWithNativeMenuItem = menu.findItem(R.id.action_open_with_native);
+        updateOpenWithNative();
+        return true;
     }
 
     @Override
@@ -132,11 +131,20 @@ public class WebViewActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return true;
+            case R.id.action_go_forward:
+                goForward();
+                return true;
             case R.id.action_reload:
                 reloadWebView();
                 return true;
+            case R.id.action_open_with_native:
+                toggleOpenWithNative();
+                return true;
             case R.id.action_copy_url:
                 copyUrl();
+                return true;
+            case R.id.action_share:
+                shareUrl();
                 return true;
             case R.id.action_open_in_browser:
                 openInBrowser();
@@ -183,19 +191,21 @@ public class WebViewActivity extends AppCompatActivity {
         return DOUBAN_HOST_PATTERN.matcher(Uri.parse(url).getHost()).matches();
     }
 
-    protected void onPageStared(WebView webView, String url, Bitmap favicon) {}
+    protected void onPageStared(WebView webView, String url, Bitmap favicon) {
+        updateGoForward();
+    }
 
     protected void onPageFinished(WebView webView, String url) {}
 
     protected boolean shouldOverrideUrlLoading(WebView webView, String url) {
         Uri uri = Uri.parse(url);
-        return DoubanUriHandler.open(uri, this) || FrodoBridge.openFrodoUri(uri, this)
+        return (Settings.OPEN_WITH_NATIVE_IN_WEBVIEW.getValue() && DoubanUriHandler.open(uri, this))
+                || FrodoBridge.openFrodoUri(uri, this)
                 || (Settings.PROGRESSIVE_THIRD_PARTY_APP.getValue()
                     && FrodoBridge.openUri(uri, this));
     }
 
     protected void reloadWebView() {
-        hideError();
         mWebView.reload();
     }
 
@@ -230,25 +240,49 @@ public class WebViewActivity extends AppCompatActivity {
         onLoadUri(mWebView);
     }
 
-    private void showError(String error) {
-        mWebView.setVisibility(View.INVISIBLE);
-        mErrorText.setText(error);
-        mErrorText.setVisibility(View.VISIBLE);
+    private void goForward() {
+        mWebView.goForward();
+        // Handled in onPageStared().
+        //updateGoForward();
     }
 
-    private void hideError() {
-        mErrorText.setVisibility(View.INVISIBLE);
-        mErrorText.setText(null);
-        mWebView.setVisibility(View.VISIBLE);
+    private void updateGoForward() {
+        if (mGoForwardMenuItem == null) {
+            return;
+        }
+        mGoForwardMenuItem.setEnabled(mWebView.canGoForward());
+    }
+
+    private void toggleOpenWithNative() {
+        Settings.OPEN_WITH_NATIVE_IN_WEBVIEW.putValue(
+                !Settings.OPEN_WITH_NATIVE_IN_WEBVIEW.getValue());
+        updateOpenWithNative();
+    }
+
+    private void updateOpenWithNative() {
+        if (mOpenWithNativeMenuItem == null) {
+            return;
+        }
+        mOpenWithNativeMenuItem.setChecked(Settings.OPEN_WITH_NATIVE_IN_WEBVIEW.getValue());
     }
 
     private void copyUrl() {
         String url = mWebView.getUrl();
-        if (!TextUtils.isEmpty(url)) {
-            ClipboardUtils.copyUrl(mWebView.getTitle(), url, this);
-        } else {
-            ToastUtils.show(R.string.webview_copy_url_empty, this);
+        if (TextUtils.isEmpty(url)) {
+            ToastUtils.show(R.string.webview_error_url_empty, this);
+            return;
         }
+        ClipboardUtils.copyText(mWebView.getTitle(), url, this);
+    }
+
+    private void shareUrl() {
+        String url = mWebView.getUrl();
+        if (TextUtils.isEmpty(url)) {
+            ToastUtils.show(R.string.webview_error_url_empty, this);
+            return;
+        }
+        startActivity(Intent.createChooser(IntentUtils.makeSendText(url), getText(
+                R.string.share_activity_chooser_title)));
     }
 
     private void openInBrowser() {
@@ -256,7 +290,7 @@ public class WebViewActivity extends AppCompatActivity {
         if (!TextUtils.isEmpty(url)) {
             UrlUtils.openWithIntent(url, this);
         } else {
-            ToastUtils.show(R.string.webview_copy_url_empty, this);
+            ToastUtils.show(R.string.webview_error_url_empty, this);
         }
     }
 
@@ -315,7 +349,7 @@ public class WebViewActivity extends AppCompatActivity {
         @Override
         public void onReceivedError(WebView view, int errorCode, String description,
                                     String failingUrl) {
-            showError(description);
+            setTitle(description);
         }
 
         @Override

@@ -7,12 +7,7 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/settings_misc_title">
-
-        <SwitchPreferenceCompat
-            android:key="@string/pref_key_auto_refresh_home"
-            android:defaultValue="@bool/pref_default_value_auto_refresh_home"
-            android:title="@string/settings_auto_refresh_home_title" />
+    <PreferenceCategory android:title="@string/settings_appearance_title">
 
         <SwitchPreferenceCompat
             android:key="@string/pref_key_show_title_for_link_entity"
@@ -20,13 +15,29 @@
             android:title="@string/settings_show_title_for_link_entity_title"
             android:summary="@string/settings_show_title_for_link_entity_summary" />
 
+        <me.zhanghai.android.douya.ui.DropDownPreference
+            android:key="@string/pref_key_night_mode"
+            android:entryValues="@array/pref_entry_values_night_mode"
+            android:defaultValue="@string/pref_default_value_night_mode"
+            android:title="@string/settings_night_mode_title"
+            android:summary="@string/settings_night_mode_summary"
+            android:entries="@array/settings_night_mode_entries" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/settings_behavior_title">
+
+        <SwitchPreferenceCompat
+            android:key="@string/pref_key_auto_refresh_home"
+            android:defaultValue="@bool/pref_default_value_auto_refresh_home"
+            android:title="@string/settings_auto_refresh_home_title" />
+
         <SwitchPreferenceCompat
             android:key="@string/pref_key_progressive_third_party_app"
             android:defaultValue="@bool/pref_default_value_progressive_third_party_app"
             android:title="@string/settings_progressive_third_party_app_title"
             android:summary="@string/settings_progressive_third_party_app_summary" />
 
-        <ListPreference
+        <me.zhanghai.android.douya.ui.DropDownPreference
             android:key="@string/pref_key_open_url_with"
             android:entryValues="@array/pref_entry_values_open_url_with"
             android:defaultValue="@string/pref_default_value_open_url_with"
@@ -35,16 +46,16 @@
             android:entries="@array/settings_open_url_with_entries" />
 
         <SwitchPreferenceCompat
+            android:key="@string/pref_key_open_with_native_in_webview"
+            android:defaultValue="@bool/pref_default_value_open_with_native_in_webview"
+            android:title="@string/settings_open_with_native_in_webview_title"
+            android:summary="@string/settings_open_with_native_in_webview_summary" />
+
+        <SwitchPreferenceCompat
             android:key="@string/pref_key_request_desktop_site_in_webview"
             android:defaultValue="@bool/pref_default_value_request_desktop_site_in_webview"
             android:title="@string/settings_request_desktop_site_in_webview_title"
             android:summary="@string/settings_request_desktop_site_in_webview_summary" />
-
-        <SwitchPreferenceCompat
-            android:key="@string/pref_key_always_copy_to_clipboard_as_text"
-            android:defaultValue="@bool/pref_default_value_always_copy_to_clipboard_as_text"
-            android:title="@string/settings_always_copy_to_clipboard_as_text_title"
-            android:summary="@string/settings_always_copy_to_clipboard_as_text_summary" />
     </PreferenceCategory>
 
     <PreferenceCategory android:title="@string/settings_about_title">

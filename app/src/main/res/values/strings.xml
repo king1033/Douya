@@ -6,6 +6,8 @@
     <string name="copy_to_clipboard">复制到剪贴板</string>
     <string name="no">否</string>
     <string name="reload">重新加载</string>
+    <string name="save">保存</string>
+    <string name="share">分享</string>
     <string name="yes">是</string>
 
     <string name="activity_not_found">未找到可处理此操作的应用</string>
@@ -13,6 +15,7 @@
     <string name="load_error">加载失败</string>
     <string name="not_yet_implemented">尚未实现，敬请期待</string>
     <string name="report_abuse">举报不良信息</string>
+    <string name="share_activity_chooser_title">分享方式</string>
     <string name="view_more">查看更多</string>
     <string name="view_more_with_count_format">查看更多（%1$d）</string>
 
@@ -36,13 +39,12 @@
     <string name="app_name">豆芽</string>
 
     <string name="api_error_parse">解析错误</string>
+    <string name="api_error_auth_failure">认证失败</string>
     <string name="api_error_timeout">请求超时</string>
     <string name="api_error_no_connection">无网络连接</string>
-    <string name="api_error_auth_failure">认证失败</string>
-    <string name="api_error_server">服务器错误</string>
     <string name="api_error_network">网络错误</string>
 
-    <string name="api_error_invalid_error_response">@string/api_error_server</string>
+    <string name="api_error_invalid_error_response">服务器错误</string>
     <string name="api_error_unknown_v2_error">未知 V2 错误</string>
     <string name="api_error_need_permission">需要权限</string>
     <string name="api_error_uri_not_found">资源不存在</string>
@@ -116,13 +118,22 @@
     <string name="auth_error_unknown">未知错误</string>
     <string name="auth_select_account">选择账户</string>
 
-    <string name="gallery_title">查看照片</string>
-    <string name="gallery_load_timeout">加载超时</string>
+    <string name="gallery_title">查看图片</string>
+    <string name="gallery_title_multiple_format">查看图片（%1$d/%2$d）</string>
+    <string name="gallery_network_error">网络错误</string>
     <string name="gallery_load_error">加载错误</string>
+    <string name="gallery_save_permission_request_message">豆芽需要权限以保存图片，请您在之后弹出的系统对话框中点击“允许”。</string>
+    <string name="gallery_save_permission_permanently_denied_message">豆芽需要权限以保存图片，请您在系统设置界面中授予“存储空间”权限。</string>
+    <string name="gallery_save_permission_permanently_denied_open_settings">打开设置</string>
+    <string name="gallery_save_permission_denied">保存图片失败，缺少权限</string>
+    <string name="gallery_save_successful">已保存图片至相册</string>
+    <string name="gallery_save_failed">保存图片失败</string>
 
     <string name="webview_title">查看网页</string>
+    <string name="webview_go_forward">前进</string>
+    <string name="webview_open_with_native">使用应用界面</string>
     <string name="webview_copy_url">复制链接</string>
-    <string name="webview_copy_url_empty">链接为空</string>
+    <string name="webview_error_url_empty">链接为空</string>
     <string name="webview_open_in_browser">在浏览器中打开</string>
 
     <string name="navigation_home">首页</string>
@@ -142,6 +153,7 @@
 
     <string name="home_broadcast">友邻广播</string>
     <string name="home_discover">浏览发现</string>
+    <string name="home_topic">话题广场</string>
     <string name="home_online">线上活动</string>
 
     <string name="broadcast_list_title_default">广播列表</string>
@@ -262,10 +274,19 @@
     <string name="item_comment_hint">我的评论…</string>
 
     <string name="settings_title">设置</string>
-    <string name="settings_misc_title">其他</string>
-    <string name="settings_auto_refresh_home_title">打开时自动刷新主页</string>
+    <string name="settings_appearance_title">外观</string>
     <string name="settings_show_title_for_link_entity_title">显示完整链接文本</string>
     <string name="settings_show_title_for_link_entity_summary">替换经过 dou.bz 缩短的链接</string>
+    <string name="settings_night_mode_title">夜间模式</string>
+    <string name="settings_night_mode_summary">%1$s</string>
+    <string-array name="settings_night_mode_entries">
+        <!--<item>跟随系统</item>-->
+        <item>关闭</item>
+        <item>开启</item>
+        <item>自动</item>
+    </string-array>
+    <string name="settings_behavior_title">行为</string>
+    <string name="settings_auto_refresh_home_title">打开时自动刷新主页</string>
     <string name="settings_progressive_third_party_app_title">渐进式第三方应用</string>
     <string name="settings_progressive_third_party_app_summary">使用豆瓣官方应用打开尚未实现的页面</string>
     <string name="settings_open_url_with_title">打开链接的方式</string>
@@ -275,12 +296,42 @@
         <item>系统打开方式</item>
         <item>Custom Tabs</item>
     </string-array>
+    <string name="settings_open_with_native_in_webview_title">在内置浏览器中使用应用界面</string>
+    <string name="settings_open_with_native_in_webview_summary">应用界面美观易用但可能有未覆盖的功能</string>
     <string name="settings_request_desktop_site_in_webview_title">在内置浏览器中请求桌面版网站</string>
     <string name="settings_request_desktop_site_in_webview_summary">豆瓣移动端网站功能有限</string>
-    <string name="settings_always_copy_to_clipboard_as_text_title">总是复制纯文本到剪贴板</string>
-    <string name="settings_always_copy_to_clipboard_as_text_summary">可以避免部分输入法的粘贴功能问题</string>
     <string name="settings_about_title">关于</string>
     <string name="settings_open_source_licenses_title">开放源代码许可</string>
+    <string name="settings_open_source_licenses_html_style_light" translatable="false">
+        body {
+            font-family: sans-serif;
+            overflow-wrap: break-word;
+        }
+        pre {
+            background: #eeeeee;
+            padding: 1em;
+            white-space: pre-wrap;
+        }
+        a, a:link, a:visited, a:hover, a:focus, a:active {
+            color: #4caf50;
+        }
+    </string>
+    <string name="settings_open_source_licenses_html_style_dark" translatable="false">
+        body {
+            background: #424242;
+            color: white;
+            font-family: sans-serif;
+            overflow-wrap: break-word;
+        }
+        pre {
+            background: #303030;
+            padding: 1em;
+            white-space: pre-wrap;
+        }
+        a, a:link, a:visited, a:hover, a:focus, a:active {
+            color: #4caf50;
+        }
+    </string>
     <string name="settings_privacy_policy_title">隐私权政策</string>
     <string name="settings_about_douya_title">关于豆芽</string>
 

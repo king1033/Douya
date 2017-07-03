@@ -7,7 +7,9 @@ package me.zhanghai.android.douya.navigation.ui;
 
 import android.accounts.Account;
 import android.accounts.OnAccountsUpdateListener;
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -19,19 +21,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.volley.VolleyError;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.zhanghai.android.douya.R;
 import me.zhanghai.android.douya.account.content.AccountUserResource;
 import me.zhanghai.android.douya.account.util.AccountUtils;
 import me.zhanghai.android.douya.link.NotImplementedManager;
+import me.zhanghai.android.douya.network.api.ApiError;
 import me.zhanghai.android.douya.network.api.info.apiv2.SimpleUser;
 import me.zhanghai.android.douya.network.api.info.apiv2.User;
 import me.zhanghai.android.douya.profile.ui.ProfileActivity;
 import me.zhanghai.android.douya.settings.ui.SettingsActivity;
-import me.zhanghai.android.douya.user.content.UserResource;
+import me.zhanghai.android.douya.util.TintHelper;
 import me.zhanghai.android.douya.util.ViewUtils;
 
 public class NavigationFragment extends Fragment implements OnAccountsUpdateListener,
@@ -95,16 +96,26 @@ public class NavigationFragment extends Fragment implements OnAccountsUpdateList
 
         AccountUtils.addOnAccountListUpdatedListener(this);
 
+        getDrawer().addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                mHeaderLayout.setShowingAccountList(false);
+            }
+        });
         mHeaderLayout.setAdapter(this);
         mHeaderLayout.setListener(this);
         mHeaderLayout.bind();
+        Activity activity = getActivity();
+        if (!ViewUtils.isLightTheme(activity)) {
+            TintHelper.setNavigationItemTint(mNavigationView, ViewUtils.getColorFromAttrRes(
+                    android.R.attr.textColorPrimary, Color.BLACK, activity));
+        }
         mNavigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.navigation_home:
-                                // TODO
                                 break;
                             case R.id.navigation_settings:
                                 openSettings();
@@ -206,7 +217,7 @@ public class NavigationFragment extends Fragment implements OnAccountsUpdateList
     public void onLoadUserFinished(int requestCode) {}
 
     @Override
-    public void onLoadUserError(int requestCode, VolleyError error) {}
+    public void onLoadUserError(int requestCode, ApiError error) {}
 
     @Override
     public void onUserChanged(int requestCode, User newUser) {
@@ -232,10 +243,11 @@ public class NavigationFragment extends Fragment implements OnAccountsUpdateList
 
     @Override
     public void openProfile(Account account) {
-        UserResource userResource = mUserResourceMap.get(account);
+        AccountUserResource userResource = mUserResourceMap.get(account);
         Intent intent;
         if (userResource.has()) {
-            intent = ProfileActivity.makeIntent(userResource.get(), getActivity());
+            // User info contains information such as isFollowed, which is affected by active user.
+            intent = ProfileActivity.makeIntent((SimpleUser) userResource.get(), getActivity());
         } else {
             // If we don't have user info, then user must also be partial. In this case we
             // can only pass user id or uid.

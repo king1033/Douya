@@ -24,9 +24,9 @@ import me.zhanghai.android.douya.R;
 
 public class TintHelper {
 
-    private static final int[] CHECKED_STATE_SET = new int[] { android.R.attr.state_checked };
-    private static final int[] DISABLED_STATE_SET = new int[] { -android.R.attr.state_enabled };
-    private static final int[] EMPTY_STATE_SET = new int[] {};
+    private static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
+    private static final int[] DISABLED_STATE_SET = { -android.R.attr.state_enabled };
+    private static final int[] EMPTY_STATE_SET = {};
 
     private TintHelper() {}
 
@@ -89,14 +89,12 @@ public class TintHelper {
         imageView.setImageDrawable(tintIcon(imageView.getDrawable(), imageView.getContext()));
     }
 
-    public static void updateNavigationItemTint(NavigationView navigationView,
-                                                int primaryColorRes) {
+    public static void setNavigationItemTint(NavigationView navigationView, int color) {
         Context context = navigationView.getContext();
-        int primaryColor = ContextCompat.getColor(context, primaryColorRes);
         navigationView.setItemIconTintList(createNavigationItemTintList(
-                android.R.attr.textColorSecondary, primaryColor, context));
+                android.R.attr.textColorSecondary, color, context));
         navigationView.setItemTextColor(createNavigationItemTintList(
-                android.R.attr.textColorPrimary, primaryColor, context));
+                android.R.attr.textColorPrimary, color, context));
     }
 
     private static ColorStateList createNavigationItemTintList(int baseColorAttrRes,

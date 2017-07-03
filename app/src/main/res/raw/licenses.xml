@@ -15,6 +15,13 @@
     </notice>
 
     <notice>
+        <name>SubsamplingScaleImageView</name>
+        <url>https://github.com/davemorrissey/subsampling-scale-image-view</url>
+        <copyright>Copyright 2016 David Morrissey</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+
+    <notice>
         <name>Glide</name>
         <url>https://github.com/bumptech/glide</url>
         <copyright>Copyright 2014 Google, Inc.</copyright>
@@ -57,9 +64,9 @@
     </notice>
 
     <notice>
-        <name>Volley</name>
-        <url>https://github.com/mcxiaoke/android-volley</url>
-        <copyright>Copyright 2014 Xiaoke Zhang&lt;br&gt;Copyright 2011 The Android Open Source Project</copyright>
+        <name>Retrofit</name>
+        <url>https://github.com/square/retrofit</url>
+        <copyright>Copyright 2013 Square, Inc.</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
 
@@ -74,6 +81,13 @@
         <name>CustomTabsHelper</name>
         <url>https://github.com/DreaminginCodeZH/CustomTabsHelper</url>
         <copyright>Copyright 2015 Zhang Hai</copyright>
+        <license>Apache Software License 2.0</license>
+    </notice>
+
+    <notice>
+        <name>EffortlessPermissions</name>
+        <url>https://github.com/DreaminginCodeZH/EffortlessPermissions</url>
+        <copyright>Copyright 2017 Zhang Hai</copyright>
         <license>Apache Software License 2.0</license>
     </notice>
 

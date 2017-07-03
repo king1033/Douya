@@ -29,8 +29,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
-import com.android.volley.VolleyError;
-
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -95,7 +93,8 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
     @BindView(R.id.send)
     ImageButton mSendButton;
 
-    private Menu mMenu;
+    private MenuItem mCopyTextMenuItem;
+    private MenuItem mDeleteMenuItem;
 
     private long mBroadcastId;
     private Broadcast mBroadcast;
@@ -267,7 +266,8 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
         super.onCreateOptionsMenu(menu, inflater);
 
         inflater.inflate(R.menu.broadcast, menu);
-        mMenu = menu;
+        mCopyTextMenuItem = menu.findItem(R.id.action_copy_text);
+        mDeleteMenuItem = menu.findItem(R.id.action_delete);
     }
 
     @Override
@@ -278,14 +278,14 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
     }
 
     private void updateOptionsMenu() {
-        if (mMenu == null) {
+        if (mCopyTextMenuItem == null && mDeleteMenuItem == null) {
             return;
         }
         Broadcast broadcast = mBroadcastAndCommentListResource.getBroadcast();
         boolean hasBroadcast = broadcast != null;
-        mMenu.findItem(R.id.action_copy_text).setVisible(hasBroadcast);
+        mCopyTextMenuItem.setVisible(hasBroadcast);
         boolean canDelete = hasBroadcast && broadcast.isAuthorOneself(getActivity());
-        mMenu.findItem(R.id.action_delete).setVisible(canDelete);
+        mDeleteMenuItem.setVisible(canDelete);
     }
 
     @Override
@@ -320,7 +320,7 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
     }
 
     @Override
-    public void onLoadBroadcastError(int requestCode, VolleyError error) {
+    public void onLoadBroadcastError(int requestCode, ApiError error) {
         LogUtils.e(error.toString());
         Activity activity = getActivity();
         ToastUtils.show(ApiError.getErrorString(error, activity), activity);
@@ -363,7 +363,7 @@ public class BroadcastFragment extends Fragment implements BroadcastAndCommentLi
     }
 
     @Override
-    public void onLoadCommentListError(int requestCode, VolleyError error) {
+    public void onLoadCommentListError(int requestCode, ApiError error) {
         LogUtils.e(error.toString());
         Activity activity = getActivity();
         ToastUtils.show(ApiError.getErrorString(error, activity), activity);
